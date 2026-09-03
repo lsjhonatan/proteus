@@ -1,24 +1,36 @@
 # -*- coding: utf-8 -*-
 
+"""
+Gerenciador do banco de dados SQLite do Proteus Tool Suite
+
+Gerencia conexões, transações e migrações do schema.
+"""
+
 import sqlite3
 import os
-from pathlib import Path
+from typing import Optional, Dict, Any, List
 from contextlib import contextmanager
+from pathlib import Path
+
+from ..exceptions import PtsError
 
 class Database:
-    DB_PATH = "/var/lib/pts/pts.db"
+    """Gerenciador do banco de dados SQLite com suporte a transações atômicas"""
     
-    def __init__(self, db_path=None):
+    DB_PATH = "/var/lib/pts/pts.db"
+    SCHEMA_VERSION = 1
+    
+    def __init__(self, db_path: Optional[str] = None):
         self.db_path = db_path or self.DB_PATH
         self._ensure_directory()
         self._initialize_schema()
     
-    def _ensure_directory(self):
+    def _ensure_directory(self) -> None:
         db_dir = os.path.dirname(self.db_path)
         if db_dir:
             Path(db_dir).mkdir(parents=True, exist_ok=True)
     
-    def _initialize_schema(self):
+    def _initialize_schema(self) -> None:
         schema = """
         CREATE TABLE IF NOT EXISTS packages (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -26,7 +38,8 @@ class Database:
             version TEXT NOT NULL,
             distro TEXT NOT NULL,
             hash_sha256 TEXT NOT NULL,
-            install_date DATETIME DEFAULT CURRENT_TIMESTAMP
+            install_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(name, distro)
         );
         
         CREATE TABLE IF NOT EXISTS snapshots (
@@ -44,20 +57,46 @@ class Database:
             FOREIGN KEY (package_id) REFERENCES packages(id) ON DELETE CASCADE,
             PRIMARY KEY (snapshot_id, package_id)
         );
+        
+        CREATE TABLE IF NOT EXISTS operations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            type TEXT NOT NULL,
+            package_id INTEGER,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+            status TEXT NOT NULL,
+            error_message TEXT,
+            FOREIGN KEY (package_id) REFERENCES packages(id)
+        );
+        
+        CREATE INDEX IF NOT EXISTS idx_packages_name ON packages(name);
+        CREATE INDEX IF NOT EXISTS idx_snapshots_created ON snapshots(created_at);
+        CREATE INDEX IF NOT EXISTS idx_operations_timestamp ON operations(timestamp);
         """
-        with self.get_connection() as conn:
-            conn.executescript(schema)
+        
+        try:
+            with self.get_connection() as conn:
+                conn.executescript(schema)
+                conn.execute("PRAGMA user_version = ?", (self.SCHEMA_VERSION,))
+        except sqlite3.Error as e:
+            raise PtsError(f"Falha ao inicializar schema do banco: {e}")
     
     @contextmanager
     def get_connection(self):
-        conn = sqlite3.connect(self.db_path, timeout=5.0)
-        conn.row_factory = sqlite3.Row
-        conn.execute("PRAGMA journal_mode=WAL")
-        conn.execute("PRAGMA foreign_keys=ON")
+        conn = None
         try:
+            conn = sqlite3.connect(self.db_path, timeout=5.0)
+            conn.row_factory = sqlite3.Row
+            conn.execute("PRAGMA journal_mode=WAL")
+            conn.execute("PRAGMA synchronous=NORMAL")
+            conn.execute("PRAGMA foreign_keys=ON")
             yield conn
+        except sqlite3.Error as e:
+            if conn:
+                conn.rollback()
+            raise PtsError(f"Erro no banco de dados: {e}")
         finally:
-            conn.close()
+            if conn:
+                conn.close()
     
     @contextmanager
     def transaction(self):
@@ -66,6 +105,17 @@ class Database:
                 conn.execute("BEGIN IMMEDIATE")
                 yield conn
                 conn.commit()
-            except Exception:
+            except Exception as e:
                 conn.rollback()
-                raise
+                raise PtsError(f"Transação falhou: {e}")
+    
+    def execute(self, query: str, params: tuple = ()) -> List[Dict]:
+        with self.get_connection() as conn:
+            cursor = conn.execute(query, params)
+            return [dict(row) for row in cursor.fetchall()]
+    
+    def execute_one(self, query: str, params: tuple = ()) -> Optional[Dict]:
+        with self.get_connection() as conn:
+            cursor = conn.execute(query, params)
+            row = cursor.fetchone()
+            return dict(row) if row else None

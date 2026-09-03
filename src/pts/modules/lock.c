@@ -19,22 +19,52 @@
 #include <Python.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <errno.h>
+#include <string.h>
+
+#define DEFAULT_TIMEOUT 30
+
+static int acquire_lock(const char *path, int timeout) {
+    int fd = open(path, O_CREAT | O_RDWR, 0644);
+    if (fd == -1) {
+        return -1;
+    }
+    
+    int ret = flock(fd, LOCK_EX | LOCK_NB);
+    int tries = 0;
+    
+    while (ret == -1 && errno == EWOULDBLOCK && tries < timeout) {
+        sleep(1);
+        tries++;
+        ret = flock(fd, LOCK_EX | LOCK_NB);
+    }
+    
+    if (ret == -1) {
+        close(fd);
+        return -1;
+    }
+    return fd;
+}
+
+static void release_lock(int fd) {
+    if (fd != -1) {
+        flock(fd, LOCK_UN);
+        close(fd);
+    }
+}
 
 static PyObject* lock_acquire(PyObject *self, PyObject *args) {
     const char *path;
-    if (!PyArg_ParseTuple(args, "s", &path)) {
+    int timeout = DEFAULT_TIMEOUT;
+    int fd;
+    
+    if (!PyArg_ParseTuple(args, "s|i", &path, &timeout)) {
         return NULL;
     }
     
-    int fd = open(path, O_CREAT | O_RDWR, 0644);
+    fd = acquire_lock(path, timeout);
     if (fd == -1) {
-        PyErr_SetString(PyExc_IOError, "Erro ao abrir arquivo de lock");
-        return NULL;
-    }
-    
-    if (flock(fd, LOCK_EX) == -1) {
-        close(fd);
-        PyErr_SetString(PyExc_IOError, "Erro ao adquirir lock");
+        PyErr_SetString(PyExc_IOError, "Não foi possível adquirir lock");
         return NULL;
     }
     
@@ -47,13 +77,12 @@ static PyObject* lock_release(PyObject *self, PyObject *args) {
         return NULL;
     }
     
-    flock(fd, LOCK_UN);
-    close(fd);
+    release_lock(fd);
     Py_RETURN_NONE;
 }
 
 static PyMethodDef methods[] = {
-    {"acquire", lock_acquire, METH_VARARGS, "Adquire lock"},
+    {"acquire", lock_acquire, METH_VARARGS, "Adquire lock exclusivo"},
     {"release", lock_release, METH_VARARGS, "Libera lock"},
     {NULL, NULL, 0, NULL}
 };
@@ -61,7 +90,7 @@ static PyMethodDef methods[] = {
 static struct PyModuleDef module = {
     PyModuleDef_HEAD_INIT,
     "_lock",
-    NULL,
+    "Módulo C para lock de arquivos com flock",
     -1,
     methods
 };
