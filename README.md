@@ -1,20 +1,12 @@
 # Proteus Tool Suite (pts)
 
+**Versão 1.0.0 lançada.**
+
 Gerenciador de pacotes universal com atomicidade, mutabilidade e estabilidade.
 
 Suporta Debian (APT), Fedora (DNF) e Arch Linux (Pacman) em uma única interface.
 
-## Filosofia
-
-- Atomicidade: operações são transacionais. Falhas resultam em rollback automático.
-- Mutabilidade: snapshots do estado do sistema permitem rollback temporal.
-- Estabilidade: verificação SHA-256 dos pacotes.
-
-## Distribuições Suportadas
-
-- Debian / Ubuntu (APT)
-- Fedora / RHEL (DNF)
-- Arch Linux (Pacman)
+---
 
 ## Instalação
 
@@ -87,6 +79,18 @@ pts snapshot-create --description "pre-upgrade"
 sudo apt upgrade
 pts rollback 3 --yes
 ```
+
+## Filosofia
+
+- Atomicidade: operações são transacionais. Falhas resultam em rollback automático.
+- Mutabilidade: snapshots do estado do sistema permitem rollback temporal.
+- Estabilidade: verificação SHA-256 dos pacotes.
+
+## Distribuições Suportadas
+
+- Debian / Ubuntu (APT)
+- Fedora / RHEL (DNF)
+- Arch Linux (Pacman)
 
 ## Estrutura do Projeto
 
