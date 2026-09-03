@@ -1,5 +1,5 @@
 /*
- * Trestle - Roteador de Anonimato em C para Raspberry Pi
+ * Proteus Tool Suit - Gerenciador de Pacotes Universal.
  * Copyright (C) 2026  Jhonatan L. Santos
  *
  * This program is free software: you can redistribute it and/or modify
