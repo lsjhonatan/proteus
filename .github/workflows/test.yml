@@ -54,18 +54,6 @@ jobs:
       run: |
         pip install -e .
     
-    - name: Run tests with temporary directories
-      env:
-        PTS_DB_PATH: /tmp/pts_test.db
-        PTS_SNAPSHOTS_DIR: /tmp/pts_snapshots
+    - name: Run tests
       run: |
-        # Cria os diretórios temporários
-        mkdir -p /tmp/pts_snapshots
-        # Roda os testes
         python -m pytest tests/ -v --cov=src/pts --cov-report=xml --cov-report=term
-    
-    - name: Upload coverage
-      uses: codecov/codecov-action@v3
-      with:
-        files: ./coverage.xml
-        flags: unittests

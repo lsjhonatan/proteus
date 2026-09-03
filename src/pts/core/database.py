@@ -2,6 +2,7 @@
 
 import sqlite3
 import os
+import tempfile
 from typing import Optional, Dict, Any, List
 from contextlib import contextmanager
 from pathlib import Path
@@ -13,21 +14,42 @@ class Database:
     SCHEMA_VERSION = 1
     
     def __init__(self, db_path: Optional[str] = None):
-        self.db_path = db_path or os.environ.get('PTS_DB_PATH') or self.DB_PATH
+        # Se for passado um caminho, usa ele
+        if db_path:
+            self.db_path = db_path
+        # Se tiver env var, usa ela
+        elif os.environ.get('PTS_DB_PATH'):
+            self.db_path = os.environ['PTS_DB_PATH']
+        # Se não tiver permissão para /var/lib/, usa temp
+        elif not self._can_write_to_var_lib():
+            temp_dir = tempfile.mkdtemp(prefix="pts_")
+            self.db_path = os.path.join(temp_dir, "pts.db")
+        else:
+            self.db_path = self.DB_PATH
+        
         self._ensure_directory()
         self._initialize_schema()
+    
+    def _can_write_to_var_lib(self) -> bool:
+        """Verifica se tem permissão para escrever em /var/lib/pts/"""
+        try:
+            Path("/var/lib/pts").mkdir(parents=True, exist_ok=True)
+            test_file = Path("/var/lib/pts/.write_test")
+            test_file.touch()
+            test_file.unlink()
+            return True
+        except (PermissionError, OSError):
+            return False
     
     def _ensure_directory(self) -> None:
         db_dir = os.path.dirname(self.db_path)
         if db_dir:
             try:
                 Path(db_dir).mkdir(parents=True, exist_ok=True)
-            except PermissionError:
-                # Fallback para diretório temporário se não tiver permissão
-                import tempfile
+            except (PermissionError, OSError):
+                # Fallback para temp se não conseguir criar o diretório
                 temp_dir = tempfile.mkdtemp(prefix="pts_")
-                fallback_path = Path(temp_dir) / "pts.db"
-                self.db_path = str(fallback_path)
+                self.db_path = os.path.join(temp_dir, "pts.db")
                 Path(temp_dir).mkdir(parents=True, exist_ok=True)
     
     def _initialize_schema(self) -> None:

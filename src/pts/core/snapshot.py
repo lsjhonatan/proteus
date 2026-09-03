@@ -2,6 +2,8 @@
 
 import json
 import hashlib
+import tempfile
+import os
 from datetime import datetime
 from pathlib import Path
 
@@ -36,13 +38,39 @@ class SnapshotManager:
     
     def __init__(self, database, snapshots_dir=None):
         self.db = database
-        # Permite sobrescrever o diretório de snapshots
+        
+        # Se for passado um diretório, usa ele
         if snapshots_dir:
             self.SNAPSHOTS_DIR = snapshots_dir
+        # Se tiver env var, usa ela
+        elif os.environ.get('PTS_SNAPSHOTS_DIR'):
+            self.SNAPSHOTS_DIR = os.environ['PTS_SNAPSHOTS_DIR']
+        # Se não tiver permissão para /var/lib/, usa temp
+        elif not self._can_write_to_var_lib():
+            temp_dir = tempfile.mkdtemp(prefix="pts_snapshots_")
+            self.SNAPSHOTS_DIR = temp_dir
+        
         self._ensure_directory()
     
+    def _can_write_to_var_lib(self) -> bool:
+        """Verifica se tem permissão para escrever em /var/lib/pts/snapshots/"""
+        try:
+            Path("/var/lib/pts/snapshots").mkdir(parents=True, exist_ok=True)
+            test_file = Path("/var/lib/pts/snapshots/.write_test")
+            test_file.touch()
+            test_file.unlink()
+            return True
+        except (PermissionError, OSError):
+            return False
+    
     def _ensure_directory(self):
-        Path(self.SNAPSHOTS_DIR).mkdir(parents=True, exist_ok=True)
+        try:
+            Path(self.SNAPSHOTS_DIR).mkdir(parents=True, exist_ok=True)
+        except (PermissionError, OSError):
+            # Fallback para temp
+            temp_dir = tempfile.mkdtemp(prefix="pts_snapshots_")
+            self.SNAPSHOTS_DIR = temp_dir
+            Path(temp_dir).mkdir(parents=True, exist_ok=True)
     
     def create(self, name: str, description: str = "") -> str:
         packages = self._get_current_state()
