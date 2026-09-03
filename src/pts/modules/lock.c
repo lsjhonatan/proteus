@@ -1,5 +1,5 @@
 /*
- * Proteus Tool Suit - Gerenciador de Pacotes Universal.
+ * Proteus Tool Suite - Gerenciador de Pacotes Universal.
  * Copyright (C) 2026  Jhonatan L. Santos
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 
 #include <Python.h>
 #include <fcntl.h>
-#include <sys/file.h>   /* <-- ESSENCIAL para flock */
+#include <sys/file.h>
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
@@ -30,16 +30,16 @@ static int acquire_lock(const char *path, int timeout) {
     if (fd == -1) {
         return -1;
     }
-    
+
     int ret = flock(fd, LOCK_EX | LOCK_NB);
     int tries = 0;
-    
+
     while (ret == -1 && errno == EWOULDBLOCK && tries < timeout) {
         sleep(1);
         tries++;
         ret = flock(fd, LOCK_EX | LOCK_NB);
     }
-    
+
     if (ret == -1) {
         close(fd);
         return -1;
@@ -58,17 +58,17 @@ static PyObject* lock_acquire(PyObject *self, PyObject *args) {
     const char *path;
     int timeout = DEFAULT_TIMEOUT;
     int fd;
-    
+
     if (!PyArg_ParseTuple(args, "s|i", &path, &timeout)) {
         return NULL;
     }
-    
+
     fd = acquire_lock(path, timeout);
     if (fd == -1) {
-        PyErr_SetString(PyExc_IOError, "Não foi possível adquirir lock");
+        PyErr_SetString(PyExc_IOError, "Nao foi possivel adquirir lock");
         return NULL;
     }
-    
+
     return PyLong_FromLong(fd);
 }
 
@@ -77,7 +77,7 @@ static PyObject* lock_release(PyObject *self, PyObject *args) {
     if (!PyArg_ParseTuple(args, "i", &fd)) {
         return NULL;
     }
-    
+
     release_lock(fd);
     Py_RETURN_NONE;
 }
@@ -91,7 +91,7 @@ static PyMethodDef methods[] = {
 static struct PyModuleDef module = {
     PyModuleDef_HEAD_INIT,
     "_lock",
-    "Módulo C para lock de arquivos com flock",
+    "Modulo C para lock de arquivos com flock",
     -1,
     methods
 };

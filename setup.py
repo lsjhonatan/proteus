@@ -9,8 +9,8 @@ class PtsBuildExt(build_ext):
     def build_extensions(self):
         if sys.platform.startswith('linux'):
             for ext in self.extensions:
-                ext.extra_compile_args += ['-O2', '-Wall', '-fPIC']
-                ext.extra_link_args += ['-lssl', '-lcrypto', '-lzstd']
+                ext.extra_compile_args = ['-O2', '-Wall', '-fPIC']
+                ext.extra_link_args = ['-lssl', '-lcrypto', '-lzstd']
         super().build_extensions()
 
 pts_modules = [
@@ -43,7 +43,6 @@ setup(
     python_requires='>=3.9',
     install_requires=[
         'click>=8.0',
-        'tomli>=2.0',
         'rich>=12.0',
     ],
     entry_points={
