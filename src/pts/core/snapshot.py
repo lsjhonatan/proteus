@@ -2,12 +2,10 @@
 
 """
 Gerenciador de snapshots do Proteus Tool Suite
-
-Criação, listagem e restauração de snapshots atômicos.
 """
 
 import json
-import time
+import os
 from datetime import datetime
 from typing import List, Dict, Optional
 from pathlib import Path
@@ -21,24 +19,17 @@ class SnapshotManager:
     
     SNAPSHOTS_DIR = "/var/lib/pts/snapshots"
     
-    def __init__(self, database):
+    def __init__(self, database, snapshots_dir=None):
         self.db = database
+        if snapshots_dir:
+            self.SNAPSHOTS_DIR = snapshots_dir
         self._ensure_directory()
     
     def _ensure_directory(self) -> None:
         Path(self.SNAPSHOTS_DIR).mkdir(parents=True, exist_ok=True)
     
     def create(self, name: str, description: str = "") -> str:
-        """
-        Cria um snapshot do estado atual dos pacotes
-        
-        Args:
-            name: Nome único do snapshot
-            description: Descrição opcional
-            
-        Returns:
-            ID do snapshot criado
-        """
+        """Cria um snapshot do estado atual dos pacotes"""
         # Coleta estado atual dos pacotes
         packages = self._get_current_state()
         
@@ -89,10 +80,7 @@ class SnapshotManager:
         return str(snapshot_id)
     
     def _get_current_state(self) -> List[Dict]:
-        """
-        Obtém o estado atual dos pacotes do sistema
-        TODO: Integrar com adaptadores reais
-        """
+        """Obtém o estado atual dos pacotes do sistema"""
         # Placeholder - será substituído pela integração real
         return [
             {"name": "nginx", "version": "1.24.0", "distro": "ubuntu", "hash": "abc123"},
@@ -105,12 +93,7 @@ class SnapshotManager:
         )
     
     def restore(self, snapshot_id: str) -> None:
-        """
-        Restaura um snapshot
-        
-        Args:
-            snapshot_id: ID ou nome do snapshot
-        """
+        """Restaura um snapshot"""
         # Busca snapshot no banco
         if snapshot_id.isdigit():
             snap = self.db.execute_one(

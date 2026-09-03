@@ -31,6 +31,13 @@ class TestAdapters:
             mock_open.return_value.__enter__.return_value.read.return_value = "ID=arch\n"
             assert detect_distro() == 'arch'
     
+    def test_detect_distro_fallback_apt(self):
+        """Testa fallback para APT quando /etc/os-release não existe"""
+        with patch('builtins.open', side_effect=FileNotFoundError):
+            with patch('subprocess.run') as mock_run:
+                mock_run.return_value.returncode = 0
+                assert detect_distro() == 'debian'
+    
     def test_get_adapter_debian(self):
         """Testa obtenção do adaptador Debian"""
         with patch('src.pts.adapters.detect_distro', return_value='debian'):

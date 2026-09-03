@@ -5,24 +5,19 @@ Testes unitários para o gerenciador de snapshots
 """
 
 import pytest
-import tempfile
 import json
 from pathlib import Path
 from src.pts.core.database import Database
 from src.pts.core.snapshot import SnapshotManager
-from src.pts.exceptions import SnapshotError, IntegrityError
 
 class TestSnapshotManager:
-    def test_create_snapshot(self, tmp_path):
+    def test_create_snapshot(self, temp_dir):
         """Testa criação de snapshot"""
-        db_path = tmp_path / "test.db"
-        snapshots_dir = tmp_path / "snapshots"
-        
-        # Configura diretório de snapshots
-        SnapshotManager.SNAPSHOTS_DIR = str(snapshots_dir)
+        db_path = temp_dir / "test.db"
+        snapshots_dir = temp_dir / "snapshots"
         
         db = Database(str(db_path))
-        snapman = SnapshotManager(db)
+        snapman = SnapshotManager(db, str(snapshots_dir))
         
         # Cria snapshot
         snap_id = snapman.create("test-snapshot", "Snapshot de teste")
@@ -46,15 +41,13 @@ class TestSnapshotManager:
         assert manifest['name'] == "test-snapshot"
         assert 'packages' in manifest
     
-    def test_list_snapshots(self, tmp_path):
+    def test_list_snapshots(self, temp_dir):
         """Testa listagem de snapshots"""
-        db_path = tmp_path / "test.db"
-        snapshots_dir = tmp_path / "snapshots"
-        
-        SnapshotManager.SNAPSHOTS_DIR = str(snapshots_dir)
+        db_path = temp_dir / "test.db"
+        snapshots_dir = temp_dir / "snapshots"
         
         db = Database(str(db_path))
-        snapman = SnapshotManager(db)
+        snapman = SnapshotManager(db, str(snapshots_dir))
         
         # Cria alguns snapshots
         snapman.create("snap-1", "Primeiro")
@@ -63,9 +56,6 @@ class TestSnapshotManager:
         # Lista
         snaps = snapman.list_all()
         assert len(snaps) == 2
-        assert snaps[0]['name'] in ["snap-1", "snap-2"]
-    
-    def test_restore_snapshot(self, tmp_path):
-        """Testa restauração de snapshot"""
-        # Este teste é mais complexo e será implementado com mocks
-        pass
+        names = [s['name'] for s in snaps]
+        assert "snap-1" in names
+        assert "snap-2" in names
