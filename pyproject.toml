@@ -9,7 +9,7 @@ description = "Proteus Tool Suite - Gerenciador de pacotes universal"
 readme = "README.md"
 license = "GPL-3.0-or-later"
 authors = [
-    {name = "Jhonatan L. Santos", email = "jhonatan@proteus.io"}
+    {name = "Jhonatan L. Santos", email = "jhonatanlucassantosofc@gmail.com"}
 ]
 requires-python = ">=3.9"
 dependencies = [
