@@ -1,8 +1,27 @@
 # -*- coding: utf-8 -*-
 
 import pytest
+import os
 import tempfile
 from pathlib import Path
+
+@pytest.fixture(autouse=True, scope="session")
+def setup_test_environment():
+    """Configura ambiente de teste com diretórios temporários"""
+    # Cria diretórios temporários
+    with tempfile.TemporaryDirectory() as tmp_db_dir, \
+         tempfile.TemporaryDirectory() as tmp_snap_dir:
+        
+        db_path = Path(tmp_db_dir) / "test.db"
+        snap_dir = Path(tmp_snap_dir)
+        
+        # Configura variáveis de ambiente
+        os.environ['PTS_DB_PATH'] = str(db_path)
+        os.environ['PTS_SNAPSHOTS_DIR'] = str(snap_dir)
+        
+        yield
+        
+        # Limpeza é automática com TemporaryDirectory
 
 @pytest.fixture
 def temp_db():
@@ -19,16 +38,3 @@ def temp_dir():
     """Cria um diretório temporário"""
     with tempfile.TemporaryDirectory() as tmpdir:
         yield Path(tmpdir)
-
-@pytest.fixture(autouse=True)
-def setup_test_env():
-    """Configura ambiente para testes"""
-    import os
-    # Garante que os testes usem um diretório temporário
-    original_db = os.environ.get('PTS_DB_PATH')
-    yield
-    # Limpa após os testes
-    if original_db:
-        os.environ['PTS_DB_PATH'] = original_db
-    else:
-        os.environ.pop('PTS_DB_PATH', None)

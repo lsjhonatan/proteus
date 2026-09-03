@@ -13,14 +13,22 @@ class Database:
     SCHEMA_VERSION = 1
     
     def __init__(self, db_path: Optional[str] = None):
-        self.db_path = db_path or self.DB_PATH
+        self.db_path = db_path or os.environ.get('PTS_DB_PATH') or self.DB_PATH
         self._ensure_directory()
         self._initialize_schema()
     
     def _ensure_directory(self) -> None:
         db_dir = os.path.dirname(self.db_path)
         if db_dir:
-            Path(db_dir).mkdir(parents=True, exist_ok=True)
+            try:
+                Path(db_dir).mkdir(parents=True, exist_ok=True)
+            except PermissionError:
+                # Fallback para diretório temporário se não tiver permissão
+                import tempfile
+                temp_dir = tempfile.mkdtemp(prefix="pts_")
+                fallback_path = Path(temp_dir) / "pts.db"
+                self.db_path = str(fallback_path)
+                Path(temp_dir).mkdir(parents=True, exist_ok=True)
     
     def _initialize_schema(self) -> None:
         schema = """
@@ -68,7 +76,6 @@ class Database:
         try:
             with self.get_connection() as conn:
                 conn.executescript(schema)
-                # CORREÇÃO: Não usar placeholder '?', usar valor direto
                 conn.execute(f"PRAGMA user_version = {self.SCHEMA_VERSION}")
         except sqlite3.Error as e:
             raise PtsError(f"Falha ao inicializar schema do banco: {e}")
