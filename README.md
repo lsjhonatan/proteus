@@ -1,6 +1,8 @@
-# Proteus Tool Suite (pts)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/lsjhonatan/proteus/releases/tag/v1.0.0)
+[![License](https://img.shields.io/badge/license-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Python](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 
-**Versão 1.0.0 lançada.**
+# Proteus Tool Suite (pts)
 
 Gerenciador de pacotes universal com atomicidade, mutabilidade e estabilidade.
 
