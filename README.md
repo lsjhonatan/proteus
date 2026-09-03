@@ -2,42 +2,53 @@
 
 Gerenciador de pacotes universal com atomicidade, mutabilidade e estabilidade.
 
-Suporta Debian (APT), Fedora (DNF) e Arch Linux (Pacman) em uma única interface, adicionando camadas de controle e segurança que os gerenciadores nativos não oferecem.
+Suporta Debian (APT), Fedora (DNF) e Arch Linux (Pacman) em uma única interface.
 
 ## Filosofia
 
-- Atomicidade: operações são transacionais. Falhas resultam em rollback automático.
+- Atomicidade: operacoes sao transacionais. Falhas resultam em rollback automatico.
 - Mutabilidade: snapshots do estado do sistema permitem rollback temporal.
-- Estabilidade: verificação SHA-256 e suporte a assinaturas GPG.
+- Estabilidade: verificacao SHA-256 dos pacotes.
 
-## Distribuições Suportadas
+## Distribuicoes Suportadas
 
 - Debian / Ubuntu (APT)
 - Fedora / RHEL (DNF)
 - Arch Linux (Pacman)
 
-## Instalação
+## Instalacao
 
-Via pip:
-
-```
-pip install pts
-```
-
-Via fonte:
+Clone o repositorio:
 
 ```
 git clone https://github.com/lsjhonatan/pts.git
 cd pts
-make install
 ```
 
-Dependências de sistema:
+Compile os modulos C:
+
+```
+make build
+```
+
+Instale o sistema:
+
+```
+sudo make install
+```
+
+Verifique a instalacao:
+
+```
+pts --version
+```
+
+## Dependencias de Sistema
 
 - Python 3.9+
 - GCC e Make
-- OpenSSL
-- Zstandard
+- OpenSSL (libssl-dev)
+- Zstandard (libzstd-dev)
 
 No Ubuntu/Debian:
 
@@ -60,7 +71,7 @@ sudo pacman -S python python-pip gcc make openssl zstd
 ## Comandos
 
 ```
-pts install <pacote>      # Instala com snapshot automático
+pts install <pacote>      # Instala com snapshot automatico
 pts remove <pacote>       # Remove pacote
 pts snapshot-create       # Cria snapshot manual
 pts snapshot-list         # Lista snapshots
@@ -101,15 +112,8 @@ pts/
 │       └── __init__.py
 ├── tests/
 │   ├── unit/
-│   │   ├── test_adapters.py
-│   │   ├── test_database.py
-│   │   └── test_snapshot.py
 │   ├── integration/
-│   │   └── test_cli.py
-│   ├── fixtures/
-│   │   └── mock_packages.json
-│   ├── conftest.py
-│   └── __init__.py
+│   └── fixtures/
 ├── docs/
 ├── LICENSE
 ├── Makefile
@@ -117,10 +121,10 @@ pts/
 └── pyproject.toml
 ```
 
-## Contribuição
+## Contribuicao
 
-Consulte CONTRIBUTING.md para detalhes sobre padrões de código, commits e fluxo de trabalho.
+Consulte CONTRIBUTING.md para detalhes sobre padroes de codigo, commits e fluxo de trabalho.
 
-## Licença
+## Licenca
 
 GNU General Public License v3.0. Consulte LICENSE.
