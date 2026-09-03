@@ -1,22 +1,22 @@
-Proteus Tool Suite (pts)
+# Proteus Tool Suite (pts)
 
 Gerenciador de pacotes universal com atomicidade, mutabilidade e estabilidade.
 
 Suporta Debian (APT), Fedora (DNF) e Arch Linux (Pacman) em uma única interface.
 
-Filosofia
+## Filosofia
 
 · Atomicidade: operações são transacionais. Falhas resultam em rollback automático.
 · Mutabilidade: snapshots do estado do sistema permitem rollback temporal.
 · Estabilidade: verificação SHA-256 dos pacotes.
 
-Distribuições Suportadas
+## Distribuições Suportadas
 
 · Debian / Ubuntu (APT)
 · Fedora / RHEL (DNF)
 · Arch Linux (Pacman)
 
-Instalação
+## Instalação
 
 Clone o repositório:
 
@@ -43,7 +43,7 @@ Verifique a instalação:
 pts --version
 ```
 
-Dependências de Sistema
+## Dependências de Sistema
 
 · Python 3.9+
 · GCC e Make
@@ -68,7 +68,7 @@ No Arch:
 sudo pacman -S python python-pip gcc make openssl zstd
 ```
 
-Comandos
+## Comandos
 
 ```
 pts install <pacote>      # Instala com snapshot automático
@@ -88,7 +88,7 @@ sudo apt upgrade
 pts rollback 3 --yes
 ```
 
-Estrutura do Projeto
+## Estrutura do Projeto
 
 ```
 pts/
@@ -121,10 +121,10 @@ pts/
 └── pyproject.toml
 ```
 
-Contribuição
+## Contribuição
 
 Consulte CONTRIBUTING.md para detalhes sobre padrões de código, commits e fluxo de trabalho.
 
-Licença
+## Licença
 
 GNU General Public License v3.0. Consulte LICENSE.
