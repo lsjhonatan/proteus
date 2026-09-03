@@ -1,11 +1,5 @@
 # -*- coding: utf-8 -*-
 
-"""
-Gerenciador do banco de dados SQLite do Proteus Tool Suite
-
-Gerencia conexões, transações e migrações do schema.
-"""
-
 import sqlite3
 import os
 from typing import Optional, Dict, Any, List
@@ -15,8 +9,6 @@ from pathlib import Path
 from ..exceptions import PtsError
 
 class Database:
-    """Gerenciador do banco de dados SQLite com suporte a transações atômicas"""
-    
     DB_PATH = "/var/lib/pts/pts.db"
     SCHEMA_VERSION = 1
     
@@ -76,7 +68,8 @@ class Database:
         try:
             with self.get_connection() as conn:
                 conn.executescript(schema)
-                conn.execute("PRAGMA user_version = ?", (self.SCHEMA_VERSION,))
+                # CORREÇÃO: Não usar placeholder '?', usar valor direto
+                conn.execute(f"PRAGMA user_version = {self.SCHEMA_VERSION}")
         except sqlite3.Error as e:
             raise PtsError(f"Falha ao inicializar schema do banco: {e}")
     

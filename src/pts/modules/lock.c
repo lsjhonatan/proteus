@@ -18,6 +18,7 @@
 
 #include <Python.h>
 #include <fcntl.h>
+#include <sys/file.h>   /* <-- ESSENCIAL para flock */
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>

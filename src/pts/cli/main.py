@@ -3,6 +3,7 @@
 
 import sys
 import logging
+import os
 from typing import Optional
 
 import click
@@ -22,13 +23,16 @@ logger = logging.getLogger("pts")
 @click.group()
 @click.version_option(version=__version__, prog_name="pts")
 @click.option('--verbose', '-v', is_flag=True, help="Aumenta verbosidade")
+@click.option('--db-path', help="Caminho alternativo para o banco de dados")
 @click.pass_context
-def cli(ctx, verbose):
+def cli(ctx, verbose, db_path):
     """Proteus Tool Suite - Gerenciador de pacotes universal"""
     level = logging.DEBUG if verbose else logging.INFO
     logging.basicConfig(level=level, format='%(asctime)s - %(levelname)s - %(message)s')
     ctx.ensure_object(dict)
     ctx.obj['verbose'] = verbose
+    # Usa o DB_PATH da env se não foi passado
+    ctx.obj['db_path'] = db_path or os.environ.get('PTS_DB_PATH')
 
 @cli.command()
 @click.argument('packages', nargs=-1, required=True)
@@ -36,11 +40,11 @@ def cli(ctx, verbose):
 def install(ctx, packages):
     """Instala um ou mais pacotes"""
     try:
+        db_path = ctx.obj.get('db_path')
         adapter = get_adapter()
-        db = Database()
+        db = Database(db_path) if db_path else Database()
         snapman = SnapshotManager(db)
         
-        # Cria snapshot automático antes da instalação
         snap_id = snapman.create(
             name=f"pre-install-{'-'.join(packages)}",
             description=f"Snapshot antes de instalar {', '.join(packages)}"
@@ -70,7 +74,9 @@ def install(ctx, packages):
 def remove(ctx, packages):
     """Remove pacotes"""
     try:
+        db_path = ctx.obj.get('db_path')
         adapter = get_adapter()
+        db = Database(db_path) if db_path else Database()
         
         for pkg in packages:
             if not adapter.is_installed(pkg):
@@ -90,7 +96,8 @@ def remove(ctx, packages):
 def snapshot_create(ctx, name, description):
     """Cria um snapshot do estado atual"""
     try:
-        db = Database()
+        db_path = ctx.obj.get('db_path')
+        db = Database(db_path) if db_path else Database()
         snapman = SnapshotManager(db)
         
         snapshot_name = name or f"snapshot-{__import__('datetime').datetime.now().strftime('%Y%m%d-%H%M%S')}"
@@ -117,7 +124,8 @@ def rollback(ctx, snapshot_id, yes):
             return
     
     try:
-        db = Database()
+        db_path = ctx.obj.get('db_path')
+        db = Database(db_path) if db_path else Database()
         snapman = SnapshotManager(db)
         snapman.restore(snapshot_id)
         console.print(f"[green]✅ Snapshot {snapshot_id} restaurado com sucesso[/green]")
@@ -131,7 +139,8 @@ def rollback(ctx, snapshot_id, yes):
 def snapshot_list(ctx):
     """Lista todos os snapshots disponíveis"""
     try:
-        db = Database()
+        db_path = ctx.obj.get('db_path')
+        db = Database(db_path) if db_path else Database()
         snapman = SnapshotManager(db)
         snapshots = snapman.list_all()
         
