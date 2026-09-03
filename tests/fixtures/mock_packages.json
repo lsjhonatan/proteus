@@ -1,0 +1,7 @@
+{
+  "packages": [
+    {"name": "nginx", "version": "1.24.0", "distro": "ubuntu"},
+    {"name": "postgresql", "version": "15.0", "distro": "ubuntu"},
+    {"name": "redis", "version": "7.2.0", "distro": "ubuntu"}
+  ]
+}
