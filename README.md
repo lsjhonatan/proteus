@@ -6,23 +6,23 @@ Suporta Debian (APT), Fedora (DNF) e Arch Linux (Pacman) em uma única interface
 
 ## Filosofia
 
-· Atomicidade: operações são transacionais. Falhas resultam em rollback automático.
-· Mutabilidade: snapshots do estado do sistema permitem rollback temporal.
-· Estabilidade: verificação SHA-256 dos pacotes.
+- Atomicidade: operações são transacionais. Falhas resultam em rollback automático.
+- Mutabilidade: snapshots do estado do sistema permitem rollback temporal.
+- Estabilidade: verificação SHA-256 dos pacotes.
 
 ## Distribuições Suportadas
 
-· Debian / Ubuntu (APT)
-· Fedora / RHEL (DNF)
-· Arch Linux (Pacman)
+- Debian / Ubuntu (APT)
+- Fedora / RHEL (DNF)
+- Arch Linux (Pacman)
 
 ## Instalação
 
 Clone o repositório:
 
 ```
-git clone https://github.com/lsjhonatan/pts.git
-cd pts
+git clone https://github.com/lsjhonatan/proteus.git
+cd proteus
 ```
 
 Compile os módulos C:
@@ -45,10 +45,10 @@ pts --version
 
 ## Dependências de Sistema
 
-· Python 3.9+
-· GCC e Make
-· OpenSSL (libssl-dev)
-· Zstandard (libzstd-dev)
+- Python 3.9+
+- GCC e Make
+- OpenSSL (libssl-dev)
+- Zstandard (libzstd-dev)
 
 No Ubuntu/Debian:
 
@@ -91,7 +91,7 @@ pts rollback 3 --yes
 ## Estrutura do Projeto
 
 ```
-pts/
+proteus/
 ├── src/
 │   └── pts/
 │       ├── adapters/
