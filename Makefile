@@ -1,26 +1,18 @@
-.PHONY: help build test clean install lint format
+.PHONY: build install clean test
 
-help:
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
+PYTHON = python3
 
-build: ## Compila módulos C e empacota
-	python3 setup.py build_ext --inplace
-	python3 -m build
+build:
+	$(PYTHON) setup.py build_ext --inplace
 
-test: ## Executa testes
-	python3 -m pytest tests/ -v --cov=src/pts
+install: build
+	$(PYTHON) setup.py install --skip-build
 
-lint: ## Executa linters
-	flake8 src/pts tests/
-	mypy src/pts
-
-format: ## Formata código
-	black src/pts tests/
-
-clean: ## Limpa artefatos
+clean:
 	rm -rf build/ dist/ *.egg-info
 	find . -name "*.pyc" -delete
 	find . -name "__pycache__" -delete
+	rm -rf src/pts/modules/*.so
 
-install: build ## Instala localmente
-	pip install -e .
+test:
+	$(PYTHON) -m pytest tests/ -v
