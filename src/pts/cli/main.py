@@ -73,10 +73,10 @@ def install(ctx, packages):
                     adapter.install(pkg)
                 progress.advance(task)
         
-        console.print(f"[green]✅ {len(packages)} pacote(s) instalado(s) com sucesso[/green]")
+        console.print(f"[green] {len(packages)} pacote(s) instalado(s) com sucesso[/green]")
         
     except PtsError as e:
-        console.print(f"[red]❌ Erro: {e}[/red]")
+        console.print(f"[red] Erro: {e}[/red]")
         sys.exit(1)
 
 @cli.command()
@@ -96,7 +96,7 @@ def remove(ctx, packages):
             console.print(f"[green]✓ {pkg} removido[/green]")
         
     except PtsError as e:
-        console.print(f"[red]❌ Erro: {e}[/red]")
+        console.print(f"[red] Erro: {e}[/red]")
         sys.exit(1)
 
 @cli.command()
@@ -115,10 +115,10 @@ def snapshot_create(ctx, name, description):
             name=snapshot_name,
             description=description or "Snapshot manual"
         )
-        console.print(f"[green]✅ Snapshot criado: ID={snapshot_id}, Nome={snapshot_name}[/green]")
+        console.print(f"[green] Snapshot criado: ID={snapshot_id}, Nome={snapshot_name}[/green]")
         
     except PtsError as e:
-        console.print(f"[red]❌ Erro ao criar snapshot: {e}[/red]")
+        console.print(f"[red] Erro ao criar snapshot: {e}[/red]")
         sys.exit(1)
 
 @cli.command()
@@ -138,10 +138,10 @@ def rollback(ctx, snapshot_id, yes):
         snapshots_dir = get_snapshots_dir(ctx)
         snapman = SnapshotManager(db, snapshots_dir)
         snapman.restore(snapshot_id)
-        console.print(f"[green]✅ Snapshot {snapshot_id} restaurado com sucesso[/green]")
+        console.print(f"[green] Snapshot {snapshot_id} restaurado com sucesso[/green]")
         
     except PtsError as e:
-        console.print(f"[red]❌ Erro ao restaurar snapshot: {e}[/red]")
+        console.print(f"[red] Erro ao restaurar snapshot: {e}[/red]")
         sys.exit(1)
 
 @cli.command()
@@ -174,7 +174,7 @@ def snapshot_list(ctx):
         console.print(table)
         
     except PtsError as e:
-        console.print(f"[red]❌ Erro ao listar snapshots: {e}[/red]")
+        console.print(f"[red] Erro ao listar snapshots: {e}[/red]")
         sys.exit(1)
 
 @cli.command()
