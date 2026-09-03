@@ -1,31 +1,31 @@
-# Proteus Tool Suite (pts)
+Proteus Tool Suite (pts)
 
 Gerenciador de pacotes universal com atomicidade, mutabilidade e estabilidade.
 
 Suporta Debian (APT), Fedora (DNF) e Arch Linux (Pacman) em uma única interface.
 
-## Filosofia
+Filosofia
 
-- Atomicidade: operacoes sao transacionais. Falhas resultam em rollback automatico.
-- Mutabilidade: snapshots do estado do sistema permitem rollback temporal.
-- Estabilidade: verificacao SHA-256 dos pacotes.
+· Atomicidade: operações são transacionais. Falhas resultam em rollback automático.
+· Mutabilidade: snapshots do estado do sistema permitem rollback temporal.
+· Estabilidade: verificação SHA-256 dos pacotes.
 
-## Distribuicoes Suportadas
+Distribuições Suportadas
 
-- Debian / Ubuntu (APT)
-- Fedora / RHEL (DNF)
-- Arch Linux (Pacman)
+· Debian / Ubuntu (APT)
+· Fedora / RHEL (DNF)
+· Arch Linux (Pacman)
 
-## Instalacao
+Instalação
 
-Clone o repositorio:
+Clone o repositório:
 
 ```
 git clone https://github.com/lsjhonatan/pts.git
 cd pts
 ```
 
-Compile os modulos C:
+Compile os módulos C:
 
 ```
 make build
@@ -37,18 +37,18 @@ Instale o sistema:
 sudo make install
 ```
 
-Verifique a instalacao:
+Verifique a instalação:
 
 ```
 pts --version
 ```
 
-## Dependencias de Sistema
+Dependências de Sistema
 
-- Python 3.9+
-- GCC e Make
-- OpenSSL (libssl-dev)
-- Zstandard (libzstd-dev)
+· Python 3.9+
+· GCC e Make
+· OpenSSL (libssl-dev)
+· Zstandard (libzstd-dev)
 
 No Ubuntu/Debian:
 
@@ -68,10 +68,10 @@ No Arch:
 sudo pacman -S python python-pip gcc make openssl zstd
 ```
 
-## Comandos
+Comandos
 
 ```
-pts install <pacote>      # Instala com snapshot automatico
+pts install <pacote>      # Instala com snapshot automático
 pts remove <pacote>       # Remove pacote
 pts snapshot-create       # Cria snapshot manual
 pts snapshot-list         # Lista snapshots
@@ -88,7 +88,7 @@ sudo apt upgrade
 pts rollback 3 --yes
 ```
 
-## Estrutura do Projeto
+Estrutura do Projeto
 
 ```
 pts/
@@ -121,10 +121,10 @@ pts/
 └── pyproject.toml
 ```
 
-## Contribuicao
+Contribuição
 
-Consulte CONTRIBUTING.md para detalhes sobre padroes de codigo, commits e fluxo de trabalho.
+Consulte CONTRIBUTING.md para detalhes sobre padrões de código, commits e fluxo de trabalho.
 
-## Licenca
+Licença
 
 GNU General Public License v3.0. Consulte LICENSE.
