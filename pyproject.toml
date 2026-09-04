@@ -7,7 +7,7 @@ name = "pts"
 version = "1.0.0"
 description = "Proteus Tool Suite - Gerenciador de pacotes universal"
 readme = "README.md"
-license = "GPL-3.0-or-later"
+license = "GPL-2.0-or-later"
 authors = [
     {name = "Jhonatan L. Santos", email = "jhonatanlucassantosofc@gmail.com"}
 ]
