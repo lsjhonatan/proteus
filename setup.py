@@ -35,7 +35,7 @@ setup(
     version='1.0.0',
     author='Jhonatan L. Santos',
     description='Proteus Tool Suite - Gerenciador de pacotes universal',
-    license='GPL-3.0-or-later',
+    license='GPL-2.0-or-later',
     packages=find_packages(where='src'),
     package_dir={'': 'src'},
     ext_modules=pts_modules,
