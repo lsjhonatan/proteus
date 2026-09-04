@@ -8,7 +8,7 @@ Atomicidade, mutabilidade e estabilidade para APT, DNF e Pacman.
 
 __version__ = "1.0.0"
 __author__ = "Jhonatan L. Santos"
-__license__ = "GPL-3.0-or-later"
+__license__ = "GPL-2.0-or-later"
 
 from .exceptions import (
     PtsError,
