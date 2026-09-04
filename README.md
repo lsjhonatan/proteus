@@ -133,4 +133,4 @@ Consulte CONTRIBUTING.md para detalhes sobre padrões de código, commits e flux
 
 ## Licença
 
-GNU General Public License v3.0. Consulte LICENSE.
+GNU General Public License v2.0. Consulte LICENSE.
